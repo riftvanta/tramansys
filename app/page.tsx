@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Testing permissions fix for Firebase Functions deployment
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
