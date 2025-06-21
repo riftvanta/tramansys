@@ -25,7 +25,10 @@ jobs:
           gcloud config set project tramansys
           # Generate access token
           export FIREBASE_TOKEN=$(gcloud auth print-access-token)
-          # Deploy with explicit targets to avoid extensions discovery
-          firebase deploy --only hosting,functions --project tramansys --token "$FIREBASE_TOKEN" --non-interactive
+          # Set environment variables to skip extensions
+          export FIREBASE_CLI_SKIP_EXTENSIONS_CHECK=true
+          export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud-service-key.json
+          # Deploy with explicit targets and force flag
+          firebase deploy --only hosting,functions:firebase-frameworks-tramansys --project tramansys --token "$FIREBASE_TOKEN" --non-interactive --force
         env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks

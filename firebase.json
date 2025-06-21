@@ -9,5 +9,16 @@
     "frameworksBackend": {
       "region": "europe-west1"
     }
+  },
+  "functions": {
+    "source": ".firebase/tramansys/functions",
+    "codebase": "firebase-frameworks-tramansys",
+    "runtime": "nodejs20",
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log"
+    ]
   }
 }
