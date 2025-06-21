@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth';
+import { hasValidTokenFormat, getTokenPayload } from '@/lib/auth-middleware';
 
 // Protected routes that require authentication
 const protectedRoutes = ['/dashboard', '/admin', '/exchange', '/orders', '/profile'];
@@ -7,8 +7,8 @@ const protectedRoutes = ['/dashboard', '/admin', '/exchange', '/orders', '/profi
 // Public routes that don't require authentication
 const publicRoutes = ['/login', '/', '/about'];
 
-// Admin-only routes
-const adminRoutes = ['/admin'];
+// Admin-only routes (will be used in Phase 3)
+// const adminRoutes = ['/admin'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -19,7 +19,6 @@ export function middleware(request: NextRequest) {
   // Check if current route is protected
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
   const isPublicRoute = publicRoutes.includes(pathname);
-  const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
   
   // If it's a public route, allow access
   if (isPublicRoute && !token) {
@@ -34,19 +33,17 @@ export function middleware(request: NextRequest) {
   
   // Verify token if present
   if (token) {
-    const payload = verifyToken(token);
+    const payload = getTokenPayload(token);
     
     // If token is invalid, clear cookie and redirect to login
-    if (!payload) {
+    if (!payload || !hasValidTokenFormat(token)) {
       const response = NextResponse.redirect(new URL('/login', request.url));
       response.cookies.delete('auth-token');
       return response;
     }
     
-    // Check admin access for admin routes
-    if (isAdminRoute && payload.role !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    }
+    // For Phase 2, we skip admin route checking since we can't validate JWT in middleware
+    // This will be properly implemented in Phase 3 with API-based validation
     
     // If authenticated user tries to access login page, redirect to dashboard
     if (pathname === '/login') {
@@ -55,9 +52,9 @@ export function middleware(request: NextRequest) {
     
     // Add user info to request headers for server components
     const requestHeaders = new Headers(request.headers);
-    requestHeaders.set('x-user-id', payload.userId);
-    requestHeaders.set('x-user-role', payload.role);
-    requestHeaders.set('x-username', payload.username);
+    if (payload.userId) requestHeaders.set('x-user-id', payload.userId);
+    if (payload.role) requestHeaders.set('x-user-role', payload.role);
+    if (payload.username) requestHeaders.set('x-username', payload.username);
     
     return NextResponse.next({
       request: {

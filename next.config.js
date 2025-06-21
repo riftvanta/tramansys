@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Performance optimizations
-  swcMinify: true,
   compress: true,
   
   // Mobile-first image optimization
@@ -14,7 +13,6 @@ const nextConfig = {
 
   // Bundle optimization
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: [
       'lucide-react',
       'date-fns',
@@ -26,13 +24,7 @@ const nextConfig = {
     ],
   },
 
-  // PWA Configuration
-  pwa: {
-    dest: 'public',
-    register: true,
-    skipWaiting: true,
-    disable: process.env.NODE_ENV === 'development',
-  },
+  // PWA Configuration will be added in Phase 8
 
   // Headers for security and performance
   async headers() {

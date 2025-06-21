@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { ApiResponse } from '@/types';
 
+// Force Node.js runtime
+export const runtime = 'nodejs';
+
 export async function POST() {
   try {
     // Create response

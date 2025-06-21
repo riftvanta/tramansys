@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken, findUserById, createSessionPayload } from '@/lib/auth';
 import { ApiResponse } from '@/types';
 
+// Force Node.js runtime for crypto operations
+export const runtime = 'nodejs';
+
 export async function GET(request: NextRequest) {
   try {
     // Get token from cookie

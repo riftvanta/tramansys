@@ -1,5 +1,5 @@
 import { type ClassValue, clsx } from 'clsx';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 
 // Utility function for combining class names
@@ -144,7 +144,7 @@ export function chunk<T>(array: T[], size: number): T[][] {
 }
 
 export function unique<T>(array: T[]): T[] {
-  return [...new Set(array)];
+  return Array.from(new Set(array));
 }
 
 // Object utilities

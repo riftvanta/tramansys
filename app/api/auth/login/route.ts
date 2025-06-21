@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticateUser, signToken } from '@/lib/auth';
 import { ApiResponse } from '@/types';
 
+// Force Node.js runtime for crypto operations
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
   try {
     const { username, password } = await request.json();
