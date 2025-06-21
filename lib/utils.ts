@@ -30,7 +30,7 @@ export function formatRelativeTime(date: Date | string): string {
 
 // Currency formatting
 export function formatCurrency(amount: number, currency: string = 'JOD'): string {
-  return new Intl.NumberFormat('ar-JO', {
+  return new Intl.NumberFormat('en-JO', {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 2,
@@ -39,7 +39,7 @@ export function formatCurrency(amount: number, currency: string = 'JOD'): string
 }
 
 export function formatNumber(num: number): string {
-  return new Intl.NumberFormat('ar-JO').format(num);
+  return new Intl.NumberFormat('en-JO').format(num);
 }
 
 // Validation utilities
