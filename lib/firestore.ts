@@ -146,6 +146,7 @@ export const userOperations = {
   async update(userId: string, userData: Partial<User>): Promise<void> {
     try {
       const docRef = doc(db, COLLECTIONS.USERS, userId);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, createdAt, ...updateData } = userData;
       await updateDoc(docRef, {
         ...updateData,
@@ -289,6 +290,7 @@ export const orderOperations = {
   async update(orderId: string, orderData: Partial<Order>): Promise<void> {
     try {
       const docRef = doc(db, COLLECTIONS.ORDERS, orderId);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, orderId: customOrderId, timestamps, ...updateData } = orderData;
       
       // Handle timestamp updates for status changes
@@ -372,7 +374,6 @@ export const orderOperations = {
       q = query(q, limit(pageSize));
       if (page > 1) {
         // This is a simplified pagination - in production, you'd want to use cursor-based pagination
-        const skipCount = (page - 1) * pageSize;
         // Note: offset is not available in Firestore, so this is a limitation
         // For production, implement cursor-based pagination
       }
@@ -492,6 +493,7 @@ export const bankOperations = {
   async update(bankId: string, bankData: Partial<Bank>): Promise<void> {
     try {
       const docRef = doc(db, COLLECTIONS.BANKS, bankId);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, createdAt, ...updateData } = bankData;
       await updateDoc(docRef, {
         ...updateData,
