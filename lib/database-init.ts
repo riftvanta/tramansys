@@ -1,6 +1,6 @@
-import { hash } from 'bcrypt';
-import { firestoreOperations } from './firestore';
-import { databaseUtils } from './database-utils';
+import { hash } from 'bcryptjs';
+import firestoreOperations from './firestore';
+import databaseUtils from './database-utils';
 
 // =============================================================================
 // DATABASE INITIALIZATION CONFIGURATION
