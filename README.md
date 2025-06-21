@@ -93,12 +93,21 @@ tramansys/
 5. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
+### Demo Credentials
+
+For testing the authentication system, use these credentials:
+
+- **Admin Access**: `admin` / `admin123`
+- **Exchange Access**: `exchange` / `exchange123`
+
+The login page will redirect you to the appropriate dashboard based on your role.
+
 ## 🏗️ Development Phases
 
 This project follows a structured 10-phase development approach:
 
 1. **Phase 1**: Project Setup & Infrastructure ✅
-2. **Phase 2**: Authentication System
+2. **Phase 2**: Authentication System ✅
 3. **Phase 3**: Database Schema & Models
 4. **Phase 4**: Admin User Management
 5. **Phase 5**: Order Management Core
