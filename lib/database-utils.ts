@@ -6,7 +6,7 @@ import {
   CommissionRate,
   CliqDetails,
   OrderStatus,
-} from '@/types';
+} from '../types';
 import { firestoreOperations } from './firestore';
 
 // =============================================================================
