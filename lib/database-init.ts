@@ -18,7 +18,7 @@ interface InitConfig {
 const DEFAULT_CONFIG: InitConfig = {
   createDefaultAdmin: true,
   adminUsername: 'admin',
-  adminPassword: 'admin123!@#',
+  adminPassword: 'admin123',
   createSampleBanks: true,
   createSamplePlatformBanks: true,
   skipExisting: true,

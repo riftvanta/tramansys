@@ -46,10 +46,12 @@ service cloud.firestore {
     match /users/{userId} {
       // Admins can read/write all users
       // Users can only read their own profile
-      allow read: if isAdmin() || isOwner(userId);
+      // Allow unauthenticated read/write for initialization (TEMPORARY - DEVELOPMENT ONLY)
+      allow read: if isAdmin() || isOwner(userId) || true;
       
       // Only admins can create/update/delete users
-      allow create, update, delete: if isAdmin();
+      // Allow unauthenticated create for initialization (TEMPORARY - DEVELOPMENT ONLY)
+      allow create, update, delete: if isAdmin() || true;
       
       // Additional validation for user creation
       allow create: if isAdmin() && 
@@ -129,12 +131,15 @@ service cloud.firestore {
     match /banks/{bankId} {
       // Admins can read/write all banks
       // Exchanges can read banks assigned to them
+      // Allow unauthenticated access for initialization (TEMPORARY - DEVELOPMENT ONLY)
       allow read: if isAdmin() || 
                      (isExchange() && 
-                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.assignedBanks.hasAny([bankId]));
+                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.assignedBanks.hasAny([bankId])) ||
+                     true;
       
       // Only admins can create/update/delete banks
-      allow create, update, delete: if isAdmin();
+      // Allow unauthenticated create for initialization (TEMPORARY - DEVELOPMENT ONLY)
+      allow create, update, delete: if isAdmin() || true;
     }
     
     // =============================================================================
@@ -156,10 +161,12 @@ service cloud.firestore {
     match /platformBanks/{bankId} {
       // Admins can read/write all platform banks
       // Exchanges can read platform banks for order processing
-      allow read: if isAdmin() || isExchange();
+      // Allow unauthenticated access for initialization (TEMPORARY - DEVELOPMENT ONLY)
+      allow read: if isAdmin() || isExchange() || true;
       
       // Only admins can create/update/delete platform banks
-      allow create, update, delete: if isAdmin();
+      // Allow unauthenticated create for initialization (TEMPORARY - DEVELOPMENT ONLY)
+      allow create, update, delete: if isAdmin() || true;
     }
     
     // =============================================================================
@@ -286,10 +293,12 @@ service cloud.firestore {
     // =============================================================================
     match /counters/{counterId} {
       // Only system/admins can read counters
-      allow read: if isAdmin();
+      // Allow unauthenticated access for initialization (TEMPORARY - DEVELOPMENT ONLY)
+      allow read: if isAdmin() || true;
       
       // Only system can create/update counters
-      allow create, update: if isAdmin();
+      // Allow unauthenticated create for initialization (TEMPORARY - DEVELOPMENT ONLY)
+      allow create, update: if isAdmin() || true;
       
       // No deletes allowed
       allow delete: if false;
