@@ -1,0 +1,305 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // =============================================================================
+    // HELPER FUNCTIONS
+    // =============================================================================
+    
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Check if user is exchange office
+    function isExchange() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'exchange';
+    }
+    
+    // Check if user owns the resource
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Check if user is active
+    function isActiveUser() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'active';
+    }
+    
+    // Check if order belongs to user
+    function ownsOrder(exchangeId) {
+      return isAuthenticated() && request.auth.uid == exchangeId;
+    }
+    
+    // =============================================================================
+    // USERS COLLECTION
+    // =============================================================================
+    match /users/{userId} {
+      // Admins can read/write all users
+      // Users can only read their own profile
+      allow read: if isAdmin() || isOwner(userId);
+      
+      // Only admins can create/update/delete users
+      allow create, update, delete: if isAdmin();
+      
+      // Additional validation for user creation
+      allow create: if isAdmin() && 
+                   validateUserData(request.resource.data) &&
+                   isValidRole(request.resource.data.role);
+      
+      // Additional validation for user updates
+      allow update: if isAdmin() && 
+                   validateUserUpdateData(request.resource.data);
+    }
+    
+    // User data validation functions
+    function validateUserData(data) {
+      return data.keys().hasAll(['username', 'password', 'role', 'balance', 'commissionRates', 'assignedBanks', 'status']) &&
+             data.username is string &&
+             data.password is string &&
+             data.role in ['admin', 'exchange'] &&
+             data.balance is number &&
+             data.status in ['active', 'inactive'];
+    }
+    
+    function validateUserUpdateData(data) {
+      return !data.diff(resource.data).affectedKeys().hasAny(['username', 'role']) ||
+             isAdmin();
+    }
+    
+    function isValidRole(role) {
+      return role in ['admin', 'exchange'];
+    }
+    
+    // =============================================================================
+    // ORDERS COLLECTION
+    // =============================================================================
+    match /orders/{orderId} {
+      // Admins can read/write all orders
+      // Exchange offices can only read/write their own orders
+      allow read: if isAdmin() || 
+                     (isExchange() && ownsOrder(resource.data.exchangeId));
+      
+      // Exchanges can create orders for themselves
+      allow create: if isActiveUser() && 
+                       isExchange() && 
+                       request.auth.uid == request.resource.data.exchangeId &&
+                       validateOrderData(request.resource.data);
+      
+      // Exchanges can update their own orders (limited fields)
+      // Admins can update any order
+      allow update: if isAdmin() || 
+                       (isExchange() && 
+                        ownsOrder(resource.data.exchangeId) && 
+                        validateExchangeOrderUpdate(request.resource.data, resource.data));
+      
+      // Only admins can delete orders
+      allow delete: if isAdmin();
+    }
+    
+    // Order data validation functions
+    function validateOrderData(data) {
+      return data.keys().hasAll(['exchangeId', 'type', 'status', 'submittedAmount', 'commission', 'screenshots']) &&
+             data.type in ['incoming', 'outgoing'] &&
+             data.status == 'submitted' &&
+             data.submittedAmount is number &&
+             data.submittedAmount > 0 &&
+             data.commission is number &&
+             data.screenshots is list;
+    }
+    
+    function validateExchangeOrderUpdate(newData, oldData) {
+      // Exchanges can only update specific fields and only in certain statuses
+      return oldData.status in ['submitted', 'pending_review'] &&
+             !newData.diff(oldData).affectedKeys().hasAny(['exchangeId', 'orderId', 'status', 'finalAmount', 'adminNotes', 'rejectionReason', 'timestamps']);
+    }
+    
+    // =============================================================================
+    // BANKS COLLECTION
+    // =============================================================================
+    match /banks/{bankId} {
+      // Admins can read/write all banks
+      // Exchanges can read banks assigned to them
+      allow read: if isAdmin() || 
+                     (isExchange() && 
+                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.assignedBanks.hasAny([bankId]));
+      
+      // Only admins can create/update/delete banks
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // =============================================================================
+    // BANK ASSIGNMENTS COLLECTION
+    // =============================================================================
+    match /bankAssignments/{assignmentId} {
+      // Admins can read/write all assignments
+      // Exchanges can read their own assignments
+      allow read: if isAdmin() || 
+                     (isExchange() && resource.data.exchangeId == request.auth.uid);
+      
+      // Only admins can create/update/delete assignments
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // =============================================================================
+    // PLATFORM BANKS COLLECTION
+    // =============================================================================
+    match /platformBanks/{bankId} {
+      // Admins can read/write all platform banks
+      // Exchanges can read platform banks for order processing
+      allow read: if isAdmin() || isExchange();
+      
+      // Only admins can create/update/delete platform banks
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // =============================================================================
+    // CHAT MESSAGES COLLECTION
+    // =============================================================================
+    match /chatMessages/{messageId} {
+      // Users can read messages for orders they're involved in
+      allow read: if isAdmin() || 
+                     (isAuthenticated() && 
+                      (resource.data.senderId == request.auth.uid ||
+                       ownsOrder(get(/databases/$(database)/documents/orders/$(resource.data.orderId)).data.exchangeId)));
+      
+      // Users can create messages for orders they're involved in
+      allow create: if isAuthenticated() && 
+                       request.resource.data.senderId == request.auth.uid &&
+                       validateChatMessage(request.resource.data);
+      
+      // No updates or deletes allowed for messages
+      allow update, delete: if false;
+    }
+    
+    function validateChatMessage(data) {
+      return data.keys().hasAll(['orderId', 'senderId', 'senderRole', 'message', 'messageType']) &&
+             data.senderId == request.auth.uid &&
+             data.message is string &&
+             data.message.size() > 0 &&
+             data.messageType in ['text', 'system'];
+    }
+    
+    // =============================================================================
+    // CHAT THREADS COLLECTION
+    // =============================================================================
+    match /chatThreads/{threadId} {
+      // Users can read threads for orders they're involved in
+      allow read: if isAdmin() || 
+                     (isAuthenticated() && 
+                      request.auth.uid in resource.data.participants);
+      
+      // Auto-created, no manual creation allowed
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // =============================================================================
+    // FILE UPLOADS COLLECTION
+    // =============================================================================
+    match /fileUploads/{fileId} {
+      // Users can read files they uploaded or for orders they own
+      allow read: if isAdmin() || 
+                     (isAuthenticated() && 
+                      (resource.data.uploadedBy == request.auth.uid ||
+                       (resource.data.orderId != null && 
+                        ownsOrder(get(/databases/$(database)/documents/orders/$(resource.data.orderId)).data.exchangeId))));
+      
+      // Users can create file upload records
+      allow create: if isAuthenticated() && 
+                       request.resource.data.uploadedBy == request.auth.uid &&
+                       validateFileUpload(request.resource.data);
+      
+      // Only allow status updates by the uploader
+      allow update: if isAuthenticated() && 
+                       resource.data.uploadedBy == request.auth.uid &&
+                       onlyStatusUpdate(request.resource.data, resource.data);
+      
+      // Only admins can delete files
+      allow delete: if isAdmin();
+    }
+    
+    function validateFileUpload(data) {
+      return data.keys().hasAll(['filename', 'originalName', 'mimeType', 'size', 'url', 'uploadedBy', 'status']) &&
+             data.mimeType.matches('image/.*') &&
+             data.size <= 5242880 && // 5MB limit
+             data.status in ['uploading', 'completed', 'failed'];
+    }
+    
+    function onlyStatusUpdate(newData, oldData) {
+      return newData.diff(oldData).affectedKeys().hasOnly(['status']) &&
+             newData.status in ['completed', 'failed'];
+    }
+    
+    // =============================================================================
+    // BALANCE TRANSACTIONS COLLECTION
+    // =============================================================================
+    match /balanceTransactions/{transactionId} {
+      // Admins can read all transactions
+      // Users can read their own transactions
+      allow read: if isAdmin() || 
+                     (isAuthenticated() && resource.data.userId == request.auth.uid);
+      
+      // Only admins can create balance transactions
+      allow create: if isAdmin();
+      
+      // No updates or deletes allowed
+      allow update, delete: if false;
+    }
+    
+    // =============================================================================
+    // NOTIFICATIONS COLLECTION
+    // =============================================================================
+    match /notifications/{notificationId} {
+      // Users can read their own notifications
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      
+      // System can create notifications for users
+      allow create: if isAdmin() || 
+                       (isAuthenticated() && 
+                        request.resource.data.userId == request.auth.uid);
+      
+      // Users can mark their own notifications as read
+      allow update: if isAuthenticated() && 
+                       resource.data.userId == request.auth.uid &&
+                       onlyMarkAsRead(request.resource.data, resource.data);
+      
+      // Only admins can delete notifications
+      allow delete: if isAdmin();
+    }
+    
+    function onlyMarkAsRead(newData, oldData) {
+      return newData.diff(oldData).affectedKeys().hasOnly(['isRead']) &&
+             newData.isRead == true;
+    }
+    
+    // =============================================================================
+    // COUNTERS COLLECTION (for order ID generation)
+    // =============================================================================
+    match /counters/{counterId} {
+      // Only system/admins can read counters
+      allow read: if isAdmin();
+      
+      // Only system can create/update counters
+      allow create, update: if isAdmin();
+      
+      // No deletes allowed
+      allow delete: if false;
+    }
+    
+    // =============================================================================
+    // DENY ALL OTHER COLLECTIONS
+    // =============================================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+} 
