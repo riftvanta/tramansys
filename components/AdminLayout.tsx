@@ -2,17 +2,21 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRequireAuth } from '@/lib/contexts/auth-context';
+import { type Locale } from '@/lib/i18n-client';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
+  dictionary?: any;
+  locale?: Locale;
 }
 
-export default function AdminLayout({ children }: AdminLayoutProps) {
+export default function AdminLayout({ children, dictionary, locale }: AdminLayoutProps) {
   const { user } = useRequireAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isRTL = locale === 'ar';
 
   // Close mobile menu when screen size changes
   useEffect(() => {
@@ -38,7 +42,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Mobile backdrop */}
       {mobileMenuOpen && (
         <div 
@@ -53,11 +57,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         mobileOpen={mobileMenuOpen}
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         onMobileToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
+        dictionary={dictionary}
+        locale={locale}
       />
 
       {/* Main content */}
       <div className={`transition-all duration-300 ease-in-out ${
-        sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'
+        isRTL 
+          ? (sidebarCollapsed ? 'md:mr-16' : 'md:mr-64')
+          : (sidebarCollapsed ? 'md:ml-16' : 'md:ml-64')
       }`}>
         {/* Header */}
         <Header 
@@ -65,6 +73,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
           onSidebarToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
           sidebarCollapsed={sidebarCollapsed}
+          dictionary={dictionary}
+          locale={locale}
         />
 
         {/* Page content */}

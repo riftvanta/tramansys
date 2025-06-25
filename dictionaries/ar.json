@@ -1,0 +1,218 @@
+{
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجح",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "view": "عرض",
+    "add": "إضافة",
+    "search": "بحث",
+    "filter": "تصفية",
+    "export": "تصدير",
+    "import": "استيراد",
+    "refresh": "تحديث",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "yes": "نعم",
+    "no": "لا",
+    "confirm": "تأكيد",
+    "close": "إغلاق"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "username": "اسم المستخدم",
+    "password": "كلمة المرور",
+    "rememberMe": "تذكرني",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "loginButton": "دخول",
+    "loginTitle": "تسجيل الدخول إلى ترامان سيس",
+    "loginSubtitle": "أدخل بياناتك للوصول إلى لوحة الإدارة",
+    "invalidCredentials": "اسم المستخدم أو كلمة المرور غير صحيحة",
+    "sessionExpired": "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.",
+    "accessDenied": "تم رفض الوصول. ليس لديك صلاحية لعرض هذه الصفحة."
+  },
+  "navigation": {
+    "dashboard": "لوحة التحكم",
+    "orders": "الطلبات",
+    "exchanges": "مكاتب الصرافة",
+    "users": "المستخدمون",
+    "banks": "البنوك",
+    "platformBanks": "بنوك المنصة",
+    "analytics": "التحليلات",
+    "settings": "الإعدادات",
+    "profile": "الملف الشخصي",
+    "help": "المساعدة",
+    "documentation": "الوثائق"
+  },
+  "dashboard": {
+    "title": "لوحة الادارة",
+    "welcome": "مرحبا بعودتك، مسؤول النظام",
+    "todayOverview": "نظرة عامة على اليوم",
+    "quickActions": "إجراءات سريعة",
+    "recentActivity": "النشاط الأخير",
+    "viewAll": "عرض الكل",
+    "noActivity": "لا يوجد نشاط حديث",
+    "stats": {
+      "totalOrders": "إجمالي الطلبات",
+      "pendingOrders": "الطلبات المعلقة",
+      "completedToday": "تمت اليوم",
+      "totalVolume": "إجمالي الحجم",
+      "platformBalance": "رصيد المنصة",
+      "needAttention": "بحاجة لإجراء",
+      "acrossAllBanks": "في جميع البنوك"
+    },
+    "actions": {
+      "manageExchanges": "إدارة مكاتب الصرافة",
+      "viewReports": "عرض التقارير",
+      "systemSettings": "إعدادات النظام"
+    }
+  },
+  "orders": {
+    "title": "إدارة الطلبات",
+    "createNew": "إنشاء طلب جديد",
+    "orderList": "قائمة الطلبات",
+    "orderDetails": "تفاصيل الطلب",
+    "orderHistory": "تاريخ الطلبات",
+    "status": {
+      "pending": "معلق",
+      "processing": "قيد المعالجة",
+      "completed": "مكتمل",
+      "cancelled": "ملغي",
+      "failed": "فشل"
+    },
+    "fields": {
+      "orderId": "رقم الطلب",
+      "customer": "العميل",
+      "amount": "المبلغ",
+      "fee": "الرسوم",
+      "total": "الإجمالي",
+      "currency": "العملة",
+      "exchange": "مكتب الصرافة",
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "تاريخ التحديث",
+      "notes": "ملاحظات"
+    }
+  },
+  "exchanges": {
+    "title": "مكاتب الصرافة",
+    "addNew": "إضافة مكتب صرافة جديد",
+    "manageExchanges": "إدارة مكاتب الصرافة",
+    "activeExchanges": "مكاتب الصرافة النشطة",
+    "inactiveExchanges": "مكاتب الصرافة غير النشطة",
+    "fields": {
+      "name": "اسم مكتب الصرافة",
+      "code": "كود مكتب الصرافة",
+      "location": "الموقع",
+      "contactPerson": "الشخص المسؤول",
+      "phone": "رقم الهاتف",
+      "email": "البريد الإلكتروني",
+      "status": "الحالة",
+      "commission": "معدل العمولة",
+      "balance": "الرصيد الحالي",
+      "joinedDate": "تاريخ الانضمام"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "suspended": "معلق"
+    }
+  },
+  "users": {
+    "title": "إدارة المستخدمين",
+    "addUser": "إضافة مستخدم",
+    "userList": "قائمة المستخدمين",
+    "userDetails": "تفاصيل المستخدم",
+    "roles": {
+      "admin": "مدير",
+      "manager": "مدير عام",
+      "operator": "مشغل",
+      "viewer": "عارض"
+    },
+    "fields": {
+      "fullName": "الاسم الكامل",
+      "username": "اسم المستخدم",
+      "email": "البريد الإلكتروني",
+      "role": "الدور",
+      "lastLogin": "آخر تسجيل دخول",
+      "createdAt": "تاريخ الإنشاء",
+      "isActive": "حالة النشاط"
+    }
+  },
+  "banks": {
+    "title": "إدارة البنوك",
+    "addBank": "إضافة بنك",
+    "bankList": "قائمة البنوك",
+    "fields": {
+      "bankName": "اسم البنك",
+      "bankCode": "كود البنك",
+      "swiftCode": "كود سويفت",
+      "country": "البلد",
+      "currency": "العملة",
+      "isActive": "حالة النشاط"
+    }
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "general": "الإعدادات العامة",
+    "security": "إعدادات الأمان",
+    "notifications": "إعدادات الإشعارات",
+    "language": "اللغة",
+    "theme": "السمة",
+    "currency": "العملة الافتراضية",
+    "timezone": "المنطقة الزمنية",
+    "changePassword": "تغيير كلمة المرور",
+    "twoFactorAuth": "المصادقة الثنائية",
+    "sessionTimeout": "انتهاء الجلسة",
+    "emailNotifications": "إشعارات البريد الإلكتروني",
+    "smsNotifications": "إشعارات الرسائل النصية"
+  },
+  "analytics": {
+    "title": "التحليلات والتقارير",
+    "overview": "نظرة عامة",
+    "transactionVolume": "حجم المعاملات",
+    "exchangePerformance": "أداء مكاتب الصرافة",
+    "userActivity": "نشاط المستخدمين",
+    "financialReports": "التقارير المالية",
+    "dateRange": "النطاق الزمني",
+    "exportData": "تصدير البيانات"
+  },
+  "languages": {
+    "english": "English",
+    "arabic": "العربية"
+  },
+  "currency": {
+    "jod": "دينار أردني",
+    "usd": "دولار أمريكي",
+    "eur": "يورو"
+  },
+  "dates": {
+    "today": "اليوم",
+    "yesterday": "أمس",
+    "thisWeek": "هذا الأسبوع",
+    "thisMonth": "هذا الشهر",
+    "lastMonth": "الشهر الماضي",
+    "custom": "نطاق مخصص"
+  },
+  "errors": {
+    "networkError": "خطأ في الشبكة. يرجى التحقق من اتصالك.",
+    "serverError": "خطأ في الخادم. يرجى المحاولة مرة أخرى لاحقاً.",
+    "notFound": "المورد المطلوب غير موجود.",
+    "unauthorized": "ليس لديك صلاحية لتنفيذ هذا الإجراء.",
+    "validationError": "يرجى التحقق من البيانات المدخلة والمحاولة مرة أخرى.",
+    "unknownError": "حدث خطأ غير معروف."
+  },
+  "messages": {
+    "saveSuccess": "تم حفظ التغييرات بنجاح",
+    "deleteSuccess": "تم حذف العنصر بنجاح",
+    "createSuccess": "تم إنشاء العنصر بنجاح",
+    "updateSuccess": "تم تحديث العنصر بنجاح",
+    "operationSuccess": "تمت العملية بنجاح",
+    "confirmDelete": "هل أنت متأكد من رغبتك في حذف هذا العنصر؟",
+    "unsavedChanges": "لديك تغييرات غير محفوظة. هل أنت متأكد من رغبتك في المغادرة؟"
+  }
+} 

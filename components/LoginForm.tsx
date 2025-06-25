@@ -5,8 +5,14 @@ import { useAuth } from '@/lib/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import { isValidUsername } from '@/lib/auth';
 import { cn } from '@/lib/utils';
+import { type Locale } from '@/lib/i18n-client';
 
-export default function LoginPage() {
+interface LoginFormProps {
+  dictionary: any;
+  locale: Locale;
+}
+
+export default function LoginForm({ dictionary, locale }: LoginFormProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,9 +25,9 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.push('/dashboard');
+      router.push(`/${locale}/dashboard`);
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, router, locale]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,7 +36,7 @@ export default function LoginPage() {
 
     // Client-side validation
     if (!username.trim() || !password.trim()) {
-      setError('Please enter both username and password');
+      setError(dictionary.auth.invalidCredentials);
       return;
     }
 
@@ -44,13 +50,13 @@ export default function LoginPage() {
       const result = await login(username.trim(), password);
 
       if (!result.success) {
-        setError(result.error || 'Login failed');
+        setError(result.error || dictionary.auth.invalidCredentials);
         return;
       }
 
       // Success - redirect will happen via useEffect
     } catch {
-      setError('An unexpected error occurred');
+      setError(dictionary.errors.unknownError);
     } finally {
       setIsSubmitting(false);
     }
@@ -84,10 +90,10 @@ export default function LoginPage() {
             </svg>
           </div>
           <h2 className="text-3xl font-bold text-secondary-900">
-            Welcome Back
+            {dictionary.auth.loginTitle}
           </h2>
           <p className="mt-2 text-sm text-secondary-600">
-            Sign in to your TramAnSys account
+            {dictionary.auth.loginSubtitle}
           </p>
         </div>
 
@@ -121,7 +127,7 @@ export default function LoginPage() {
             {/* Username Field */}
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-secondary-700 mb-2">
-                Username
+                {dictionary.auth.username}
               </label>
               <input
                 id="username"
@@ -133,7 +139,7 @@ export default function LoginPage() {
                   'input',
                   error && 'border-error-300 focus:ring-error-500'
                 )}
-                placeholder="Enter your username"
+                placeholder={dictionary.auth.username}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={isSubmitting}
@@ -143,7 +149,7 @@ export default function LoginPage() {
             {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-secondary-700 mb-2">
-                Password
+                {dictionary.auth.password}
               </label>
               <div className="relative">
                 <input
@@ -156,7 +162,7 @@ export default function LoginPage() {
                     'input pr-10',
                     error && 'border-error-300 focus:ring-error-500'
                   )}
-                  placeholder="Enter your password"
+                  placeholder={dictionary.auth.password}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isSubmitting}
@@ -194,10 +200,10 @@ export default function LoginPage() {
                 {isSubmitting ? (
                   <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Signing in...
+                    {dictionary.common.loading}
                   </div>
                 ) : (
-                  'Sign in'
+                  dictionary.auth.loginButton
                 )}
               </button>
             </div>

@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { type Locale } from '@/lib/i18n-client';
 // Using inline SVG icons instead of Heroicons to avoid module loading issues
 const icons = {
   HomeIcon: () => (
@@ -63,58 +64,62 @@ interface SidebarProps {
   mobileOpen: boolean;
   onToggle: () => void;
   onMobileToggle: () => void;
+  dictionary?: any;
+  locale?: Locale;
 }
 
-const menuItems = [
-  {
-    name: 'Dashboard',
-    href: '/dashboard',
-    icon: icons.HomeIcon,
-  },
-  {
-    name: 'Orders',
-    href: '/dashboard/orders',
-    icon: icons.ClipboardDocumentListIcon,
-  },
-  {
-    name: 'Exchanges',
-    href: '/dashboard/exchanges',
-    icon: icons.ArrowsRightLeftIcon,
-  },
-  {
-    name: 'Users',
-    href: '/dashboard/users',
-    icon: icons.UsersIcon,
-  },
-  {
-    name: 'Banks',
-    href: '/dashboard/banks',
-    icon: icons.BuildingLibraryIcon,
-  },
-  {
-    name: 'Platform Banks',
-    href: '/dashboard/platform-banks',
-    icon: icons.BanknotesIcon,
-  },
-  {
-    name: 'Analytics',
-    href: '/dashboard/analytics',
-    icon: icons.ChartBarIcon,
-  },
-  {
-    name: 'Settings',
-    href: '/dashboard/settings',
-    icon: icons.Cog6ToothIcon,
-  },
-];
-
-export default function Sidebar({ collapsed, mobileOpen, onToggle }: SidebarProps) {
+export default function Sidebar({ collapsed, mobileOpen, onToggle, dictionary, locale }: SidebarProps) {
   const pathname = usePathname();
+  const isRTL = locale === 'ar';
+
+  // Menu items with translation keys
+  const menuItems = [
+    {
+      name: dictionary?.navigation?.dashboard || 'Dashboard',
+      href: `/${locale}/dashboard`,
+      icon: icons.HomeIcon,
+    },
+    {
+      name: dictionary?.navigation?.orders || 'Orders',
+      href: `/${locale}/dashboard/orders`,
+      icon: icons.ClipboardDocumentListIcon,
+    },
+    {
+      name: dictionary?.navigation?.exchanges || 'Exchanges',
+      href: `/${locale}/dashboard/exchanges`,
+      icon: icons.ArrowsRightLeftIcon,
+    },
+    {
+      name: dictionary?.navigation?.users || 'Users',
+      href: `/${locale}/dashboard/users`,
+      icon: icons.UsersIcon,
+    },
+    {
+      name: dictionary?.navigation?.banks || 'Banks',
+      href: `/${locale}/dashboard/banks`,
+      icon: icons.BuildingLibraryIcon,
+    },
+    {
+      name: dictionary?.navigation?.platformBanks || 'Platform Banks',
+      href: `/${locale}/dashboard/platform-banks`,
+      icon: icons.BanknotesIcon,
+    },
+    {
+      name: dictionary?.navigation?.analytics || 'Analytics',
+      href: `/${locale}/dashboard/analytics`,
+      icon: icons.ChartBarIcon,
+    },
+    {
+      name: dictionary?.navigation?.settings || 'Settings',
+      href: `/${locale}/dashboard/settings`,
+      icon: icons.Cog6ToothIcon,
+    },
+  ];
 
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className={`fixed top-0 left-0 z-30 h-full bg-white shadow-lg border-r border-gray-200 transition-all duration-300 ease-in-out ${
+      <div className={`fixed top-0 ${isRTL ? 'right-0' : 'left-0'} z-30 h-full bg-white shadow-lg ${isRTL ? 'border-l' : 'border-r'} border-gray-200 transition-all duration-300 ease-in-out ${
         collapsed ? 'w-16' : 'w-64'
       } hidden md:block`}>
         
@@ -125,7 +130,7 @@ export default function Sidebar({ collapsed, mobileOpen, onToggle }: SidebarProp
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">T</span>
               </div>
-              <span className="ml-2 text-lg font-semibold text-gray-900">TramAnSys</span>
+              <span className={`${isRTL ? 'mr-2' : 'ml-2'} text-lg font-semibold text-gray-900`}>TramAnSys</span>
             </div>
           )}
           {collapsed && (
@@ -136,15 +141,15 @@ export default function Sidebar({ collapsed, mobileOpen, onToggle }: SidebarProp
         </div>
 
         {/* Toggle Button */}
-        <div className="absolute -right-3 top-20 z-40">
+        <div className={`absolute ${isRTL ? '-left-3' : '-right-3'} top-20 z-40`}>
           <button
             onClick={onToggle}
             className="w-6 h-6 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-shadow"
           >
             {collapsed ? (
-              <icons.ChevronDoubleRightIcon />
+              isRTL ? <icons.ChevronDoubleLeftIcon /> : <icons.ChevronDoubleRightIcon />
             ) : (
-              <icons.ChevronDoubleLeftIcon />
+              isRTL ? <icons.ChevronDoubleRightIcon /> : <icons.ChevronDoubleLeftIcon />
             )}
           </button>
         </div>
@@ -160,16 +165,16 @@ export default function Sidebar({ collapsed, mobileOpen, onToggle }: SidebarProp
                     href={item.href}
                     className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                       isActive
-                        ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-600'
+                        ? `bg-primary-50 text-primary-700 ${isRTL ? 'border-l-2' : 'border-r-2'} border-primary-600`
                         : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                     }`}
                   >
-                    <div className={`${collapsed ? '' : 'mr-3'} ${
+                    <div className={`${collapsed ? '' : isRTL ? 'ml-3' : 'mr-3'} ${
                       isActive ? 'text-primary-600' : 'text-gray-400'
                     }`}>
                       <item.icon />
                     </div>
-                    {!collapsed && <span>{item.name}</span>}
+                    {!collapsed && <span className={isRTL ? 'text-right' : 'text-left'}>{item.name}</span>}
                   </Link>
                 </li>
               );
@@ -179,8 +184,8 @@ export default function Sidebar({ collapsed, mobileOpen, onToggle }: SidebarProp
       </div>
 
       {/* Mobile Sidebar */}
-      <div className={`fixed top-0 left-0 z-50 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:hidden ${
-        mobileOpen ? 'translate-x-0' : '-translate-x-full'
+      <div className={`fixed top-0 ${isRTL ? 'right-0' : 'left-0'} z-50 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:hidden ${
+        mobileOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')
       }`}>
         
         {/* Logo Section */}
@@ -188,7 +193,7 @@ export default function Sidebar({ collapsed, mobileOpen, onToggle }: SidebarProp
           <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">T</span>
           </div>
-          <span className="ml-2 text-lg font-semibold text-gray-900">TramAnSys</span>
+          <span className={`${isRTL ? 'mr-2' : 'ml-2'} text-lg font-semibold text-gray-900`}>TramAnSys</span>
         </div>
 
         {/* Navigation */}
@@ -202,16 +207,16 @@ export default function Sidebar({ collapsed, mobileOpen, onToggle }: SidebarProp
                     href={item.href}
                     className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                       isActive
-                        ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-600'
+                        ? `bg-primary-50 text-primary-700 ${isRTL ? 'border-l-2' : 'border-r-2'} border-primary-600`
                         : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                     }`}
                   >
-                    <div className={`mr-3 ${
+                    <div className={`${isRTL ? 'ml-3' : 'mr-3'} ${
                       isActive ? 'text-primary-600' : 'text-gray-400'
                     }`}>
                       <item.icon />
                     </div>
-                    <span>{item.name}</span>
+                    <span className={isRTL ? 'text-right' : 'text-left'}>{item.name}</span>
                   </Link>
                 </li>
               );
